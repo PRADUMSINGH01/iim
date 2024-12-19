@@ -102,13 +102,14 @@ export default function Nav() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        <NavigationMenuItem className="flex justify-between w-full">
           <Link href="/Price" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Price
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
+        <NavigationMenuItem></NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );

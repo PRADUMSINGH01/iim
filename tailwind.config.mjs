@@ -8,6 +8,11 @@ export default {
   ],
   theme: {
     extend: {
+      textStroke: {
+        sm: "1px",
+        md: "2px",
+        lg: "3px",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -57,5 +62,20 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities }) {
+      addUtilities({
+        ".text-stroke-sm": {
+          "-webkit-text-stroke": "1px",
+        },
+        ".text-stroke-md": {
+          "-webkit-text-stroke": "2px",
+        },
+        ".text-stroke-lg": {
+          "-webkit-text-stroke": "3px",
+        },
+      });
+    },
+  ],
 };
