@@ -10,6 +10,7 @@ import Stepper from "@/components/ProductUI/stepper/Stepper";
 import Arrow from "@/components/ProductUI/Image/a.png";
 import Footer from "@/components/ProductUI/Footer/Footer";
 import { CarouselSize } from "@/components/ProductUI/Caru/caru";
+import FAQ from "./FAQ/page";
 
 export default function Home() {
   return (
@@ -68,6 +69,8 @@ export default function Home() {
       </div>
 
       <CarouselSize />
+
+      <FAQ />
       <Footer />
     </>
   );
