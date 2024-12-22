@@ -1,3 +1,4 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,8 +10,37 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 export function LoginForm({ className, ...props }) {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const HandleForm = (e) => {
+    const { name, value } = e.target;
+    setFormData((pre) => ({ ...pre, [name]: value }));
+  };
+  console.log(formData);
+  const Verification = async () => {
+    try {
+      console.log("Api call ");
+      const fetchdata = await fetch("api/Login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData }),
+      });
+
+      const data = await fetchdata.json();
+      if (data.success) {
+        console.log(data.msg);
+      } else {
+        console.log("failed to verify");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -21,15 +51,18 @@ export function LoginForm({ className, ...props }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={Verification}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="m@example.com"
                   required
+                  value={formData.value}
+                  onChange={HandleForm}
                 />
               </div>
               <div className="grid gap-2">
@@ -42,7 +75,14 @@ export function LoginForm({ className, ...props }) {
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.value}
+                  onChange={HandleForm}
+                  required
+                />
               </div>
               <Button type="submit" className="w-full">
                 Login

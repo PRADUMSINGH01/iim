@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 const SignUp = () => {
+  const [success, setsuccess] = useState("");
   const [formData, setFormData] = useState({
     fname: "",
     lname: "",
@@ -32,16 +33,25 @@ const SignUp = () => {
 
       const data = await res.json();
 
-      if (data.success) {
-        console.log("Hashed Password:", data.hashedPassword);
+      if (data.success === "regi") {
+        setsuccess(data.msg);
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      } else if (data.success === "login") {
+        setsuccess(data.msg);
+        setTimeout(() => {
+          console.log("login");
+          window.location.href = "/login";
+        }, 2000);
       } else {
-        console.error("Error:", data.error);
+        console.log("Error:");
       }
     } catch (error) {
       console.error("Fetch error:", error);
     }
   }
-  Hash();
+
   const validateForm = () => {
     const newErrors = {};
     if (!formData.fname) newErrors.fname = "First name is required";
@@ -58,12 +68,19 @@ const SignUp = () => {
       setErrors(validationErrors);
       return;
     }
-    console.log("Form Submitted:", formData);
+    //console.log("Form Submitted:", formData);
     setErrors({});
   };
 
   return (
     <div className="w-full max-w-md bg-black mx-auto mb-4 h-auto border border-gray-800 rounded-md shadow-md text-white flex flex-col justify-center items-center p-6 mt-20 font-[family-name:var(--font-geist-sans)]">
+      {success ? (
+        <div className="absolute bg-black top-0 w-full p-5 text-center  z-10 text-white text-2xl">
+          {success}
+        </div>
+      ) : (
+        ""
+      )}
       <h1 className="text-4xl text-center mb-6">Register Your Account</h1>
       <form onSubmit={handleSubmit} className="w-full flex flex-col space-y-4">
         {/* First Name */}
@@ -135,7 +152,11 @@ const SignUp = () => {
         </div>
 
         {/* Submit Button */}
-        <Button type="submit" className="mt-6 w-full py-2 text-lg">
+        <Button
+          type="submit"
+          onClick={Hash}
+          className="mt-6 w-full py-2 text-lg"
+        >
           Submit
         </Button>
       </form>
