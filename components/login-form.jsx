@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 export function LoginForm({ className, ...props }) {
+  const [success, setsuccess] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,8 +33,12 @@ export function LoginForm({ className, ...props }) {
 
       const data = await fetchdata.json();
       if (data.success) {
-        console.log(data.msg);
+        setsuccess(data.msg);
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
       } else {
+        setsuccess(data.msg);
         console.log("failed to verify");
       }
     } catch (error) {
@@ -42,6 +47,11 @@ export function LoginForm({ className, ...props }) {
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      {success ? (
+        <div className="bg-black text-white text-2xl absolute ">{success}</div>
+      ) : (
+        <></>
+      )}
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>

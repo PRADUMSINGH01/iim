@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import argon2 from "argon2";
+//import argon2 from "argon2";
 import { db } from "@/lib/firebase";
 export async function POST(req) {
   try {
@@ -22,7 +22,7 @@ export async function POST(req) {
     }
 
     // Hash the password
-    const hashedPassword = await argon2.hash(password);
+    const hashedPassword = 12345; // await argon2.hash(password);
 
     const docRef = await db.collection("Users").add({
       fname,
