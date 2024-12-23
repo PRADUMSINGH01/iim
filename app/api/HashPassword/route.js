@@ -32,12 +32,11 @@ export async function POST(req) {
       email,
       password: hashedPassword,
     });
-    console.log("User added successfully:", docRef.id);
+    console.log("User added successfully:");
 
     return NextResponse.json({
       success: "regi",
       msg: "Welcome to Invoice",
-      userId: docRef.id, // Optional: Return the created document ID
     });
   } catch (error) {
     console.error("Error creating user:", error.message); // Log error for debugging

@@ -21,10 +21,9 @@ export function LoginForm({ className, ...props }) {
     const { name, value } = e.target;
     setFormData((pre) => ({ ...pre, [name]: value }));
   };
-  console.log(formData);
+
   const Verification = async () => {
     try {
-      console.log("Api call ");
       const fetchdata = await fetch("api/Login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
