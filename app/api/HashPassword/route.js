@@ -4,8 +4,6 @@ import { db } from "@/lib/firebase";
 export async function POST(req) {
   try {
     const { fname, lname, email, password } = await req.json();
-    //const password = "12344";
-    //console.log(fname, lname, email, password);
     if (!password || !fname || !lname || !email) {
       return NextResponse.json(
         { success: false, error: "All fields are required" },
@@ -18,7 +16,7 @@ export async function POST(req) {
       if (!snapshot.empty) {
         return NextResponse.json({
           success: "login",
-          msg: "You have an account",
+          msg: "You have an account ",
         });
       }
     }
