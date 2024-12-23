@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 
-// This function can be marked `async` if using `await` inside
 export function middleware(request) {
-  let cookie = request.cookies.get("token");
-  console.log(cookie);
-  return NextResponse.json({ success: true });
+  // Check for the 'token' cookie
+  const token = request.cookies.get("token");
+  console.log("Token:", token);
+  console.log("Middleware is running!");
+
+  // Example: Return a JSON response (not typical in middleware)
+  return NextResponse.next();
 }
 
-// See "Matching Paths" below to learn more
+// Configure the matcher
 export const config = {
-  matcher: "/SignUp",
+  matcher: "/:path*", // Applies to all routes
 };
