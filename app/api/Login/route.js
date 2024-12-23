@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
+/*
 //import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 export async function POST(res) {
@@ -31,9 +32,48 @@ export async function POST(res) {
     });
 
     // Set the cookie in the response
-  }*/
+  }
   return NextResponse.json({
     msg: "You are logged in",
     data: data.email,
   });
+}
+ */
+
+export async function POST(req) {
+  try {
+    const body = await req.json(); // Parse JSON body
+
+    const email = body?.email?.replace(/ /g, ""); // Safe access
+    const password = body?.password;
+
+    if (!email || !password) {
+      return new NextResponse.json(
+        {
+          success: false,
+          msg: "Email and password are required",
+        },
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    } else {
+      const usersRef = db.collection("Users");
+      const snapshot = await usersRef.where("email", "==", email).get();
+      const userDoc = snapshot.docs[0];
+      const data = userDoc.data();
+      console.log(data.email);
+      return NextResponse.json({
+        success: true,
+        msg: "Login successful",
+        data: data.email,
+      });
+    }
+
+    // Perform your login logic here
+  } catch (error) {
+    console.error("API Login Error:", error);
+    return NextResponse.json(
+      { success: false, msg: "Server error" },
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
 }

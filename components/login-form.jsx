@@ -24,6 +24,7 @@ export function LoginForm({ className, ...props }) {
   };
 
   const Verification = async () => {
+    console.log("verify");
     try {
       const fetchdata = await fetch("api/Login", {
         method: "POST",
