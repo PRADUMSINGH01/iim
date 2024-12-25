@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
+import clientPromise from "@/lib/mongodb";
 /*
 //import argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -38,42 +38,20 @@ export async function POST(res) {
     data: data.email,
   });
 }
- */
-
-export async function POST(req) {
+*/
+export async function GET(req) {
   try {
-    const body = await req.json(); // Parse JSON body
+    const client = await clientPromise;
+    const db = client.db("Users"); // Replace with your DB name
 
-    const email = body?.email?.replace(/ /g, ""); // Safe access
-    const password = body?.password;
+    const collection = db.collection("Usersdata"); // Replace with your collection name
+    const data = await collection.find({}).toArray();
 
-    if (!email || !password) {
-      return new NextResponse.json(
-        {
-          success: false,
-          msg: "Email and password are required",
-        },
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    } else {
-      const usersRef = db.collection("Users");
-      const snapshot = await usersRef.where("email", "==", email).get();
-      const userDoc = snapshot.docs[0];
-      const data = userDoc.data();
-      console.log(data.email);
-      return NextResponse.json({
-        success: true,
-        msg: "Login successful",
-        data: data.email,
-      });
-    }
-
-    // Perform your login logic here
+    return new Response(JSON.stringify({ success: true, data }), {
+      status: 200,
+    });
   } catch (error) {
-    console.error("API Login Error:", error);
-    return NextResponse.json(
-      { success: false, msg: "Server error" },
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    console.error(error);
+    return new NextResponse.json({ success: false, msg: error });
   }
 }
