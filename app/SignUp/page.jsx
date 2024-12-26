@@ -32,8 +32,8 @@ const SignUp = () => {
       });
 
       const data = await res.json();
-
-      if (data.success === "regi") {
+      console.log(data.password);
+      if (data.success == true) {
         setsuccess(data.msg);
         setTimeout(() => {
           window.location.href = "/";
