@@ -4,8 +4,11 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 const SignUp = () => {
+  const [data, setdata] = useState([]);
+
   const [success, setsuccess] = useState("");
   const [formData, setFormData] = useState({
     fname: "",
@@ -21,9 +24,14 @@ const SignUp = () => {
   };
 
   async function Hash() {
-    if (formData.password === "") {
-      console.log("Please submit password");
+    const usersRef = collection(db, "users"); // Replace 'users' with your collection name
+    const q = query(usersRef, where("email", "==", formData.email));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      console.log("User already exists with this email.");
+      return "User exists";
     }
+
     try {
       const res = await fetch("/api/HashPassword", {
         method: "POST",
