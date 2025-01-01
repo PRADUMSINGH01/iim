@@ -55,7 +55,7 @@ const components = [
 export default function Nav() {
   const { setTheme } = useTheme();
   return (
-    <NavigationMenu className="absolute top-3 font-[family-name:var(--font-geist-sans)]">
+    <NavigationMenu className="p-4 font-[family-name:var(--font-geist-sans)]">
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>

@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import Nav from "@/components/ProductUI/Nav/Nav";
 import Image from "next/image";
 import L from "@/components/ProductUI/Image/l.png";
-import { PDF } from "@/components/ProductUI/Invoice/PDF";
 import Invoice from "@/components/ProductUI/Invoice/Invoice";
 import Stepper from "@/components/ProductUI/stepper/Stepper";
 import Arrow from "@/components/ProductUI/Image/a.png";
 import Footer from "@/components/ProductUI/Footer/Footer";
 import { CarouselSize } from "@/components/ProductUI/Caru/caru";
 import FAQ from "./FAQ/page";
-
+import Link from "next/link";
 export default function Home() {
   return (
     <>
@@ -34,9 +33,10 @@ export default function Home() {
         <div className="flex justify-around w-full mt-5 p-2">
           <Button>
             {" "}
-            Create Invoice
+            <Link href={"/Create-Invoice"}>Create Invoice</Link>
             <IoMdPaperPlane className="text-pink-500 font-bold " />
           </Button>
+
           <Button>
             {" "}
             Explore Templates
@@ -69,7 +69,7 @@ export default function Home() {
       </div>
 
       <CarouselSize />
-<PDF/>
+
       <FAQ />
       <Footer />
     </>

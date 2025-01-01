@@ -1,4 +1,5 @@
 "use client";
+//import argon2 from "argon2";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import AddCookies from "@/lib/AddCookies";
 export function LoginForm({ className, ...props }) {
   const [success, setsuccess] = useState("");
   const [formData, setFormData] = useState({
@@ -24,26 +27,36 @@ export function LoginForm({ className, ...props }) {
   };
 
   const Verification = async () => {
-    console.log("verify");
-    try {
-      const fetchdata = await fetch("api/Login", {
+    const usersRef = collection(db, "Users"); // Replace 'users' with your collection name
+    const q = query(usersRef, where("email", "==", formData.email));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      console.log("User Not exists with this email.");
+      return "User Not exists";
+    } else {
+      const results = [];
+      querySnapshot.forEach((doc) => {
+        results.push({ id: doc.id, ...doc.data() });
+      });
+      const shouldPasswordVerify = await results[0].password;
+      const res = await fetch("/api/Login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData }),
+        body: JSON.stringify({
+          dbpassword: shouldPasswordVerify,
+          password: formData.password,
+        }),
       });
 
-      const data = await fetchdata.json();
-      if (data.success) {
+      const data = await res.json();
+      if (data.token) {
         setsuccess(data.msg);
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 2000);
+        console.log("data " + data.token);
+
+        AddCookies(data.token);
       } else {
         setsuccess(data.msg);
-        console.log("failed to verify");
       }
-    } catch (error) {
-      console.log(error);
     }
   };
   return (

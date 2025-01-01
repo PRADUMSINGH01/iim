@@ -24,15 +24,14 @@ const SignUp = () => {
   };
 
   async function Hash() {
-    const usersRef = collection(db, "users"); // Replace 'users' with your collection name
-    const q = query(usersRef, where("email", "==", formData.email));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      console.log("User already exists with this email.");
-      return "User exists";
-    }
-
     try {
+      const usersRef = collection(db, "Users"); // Replace 'users' with your collection name
+      const q = query(usersRef, where("email", "==", formData.email));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        console.log("User already exists with this email.");
+        return "User exists";
+      } 
       const res = await fetch("/api/HashPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,9 +39,11 @@ const SignUp = () => {
       });
 
       const data = await res.json();
-      console.log(data.password);
+      console.log(data.password)
       if (data.success == true) {
+        await addDoc(usersRef, data.Data);
         setsuccess(data.msg);
+
         setTimeout(() => {
           window.location.href = "/";
         }, 2000);
@@ -90,7 +91,7 @@ const SignUp = () => {
         ""
       )}
       <h1 className="text-4xl text-center mb-6">Register Your Account</h1>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col space-y-4">
+      <form  action={Hash} className="w-full flex flex-col space-y-4">
         {/* First Name */}
         <div>
           <Label htmlFor="fname">First Name</Label>
@@ -162,7 +163,6 @@ const SignUp = () => {
         {/* Submit Button */}
         <Button
           type="submit"
-          onClick={Hash}
           className="mt-6 w-full py-2 text-lg"
         >
           Submit

@@ -1,37 +1,39 @@
 import { NextResponse } from "next/server";
-//import clientPromise from "@/lib/mongodb";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
-export async function POST(res) {
-  const JWT = process.env.JWT;
-  const { password } = await res.json();
 
+export async function POST(res) {
+  const JWT_SECRET =
+    "d2c67f897fc9f3dbdfcd3eb39d7c89e1fcbf42820b63c7b9f4b1bc6be5d9b1f0";
   try {
-    const isPasswordValid = await argon2.verify(data.password, password);
-    console.log(data);
+    const { password, dbpassword } = await res.json();
+
+    console.log(password, dbpassword);
+    // Verify the password
+    const isPasswordValid = await argon2.verify(dbpassword, password);
 
     if (!isPasswordValid) {
       return NextResponse.json({
         success: false,
-        msg: "Invilid Email and Password ...",
-      });
-    } else {
-      // Generate JWT token
-      const token = jwt.sign({ id: data.id, email: data.email }, JWT, {
-        expiresIn: "7d",
-      });
-
-      return NextResponse.json({
-        success: true,
-        token: token,
-        msg: "You are logged in",
+        msg: "Invalid email or password.",
       });
     }
+
+    // Generate JWT token (avoid including sensitive data like the password)
+    const token = jwt.sign({ user: dbpassword }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return NextResponse.json({
+      success: true,
+      token,
+      msg: "You are logged in.",
+    });
   } catch (error) {
-    // Set the cookie in the response
+    console.error("Error during login:", error);
+    return NextResponse.json({
+      success: false,
+      msg: "An error occurred during login.",
+    });
   }
-  return NextResponse.json({
-    msg: "You are logged in",
-    data: data.email,
-  });
 }

@@ -1,5 +1,7 @@
 import * as React from "react";
 const arr = [1, 2, 3];
+import { PDF } from "@/components/ProductUI/Invoice/PDF";
+
 import { Button } from "@/components/ui/button";
 export function CarouselSize() {
   const [count, setcount] = React.useState(0);
@@ -20,7 +22,7 @@ export function CarouselSize() {
         </Button>
         <div className="  overflow-hidden h-full  border shadow-md  flex items-center justify-center mb-10">
           <div className="w-[40rem]  h-[35rem] border shadow-md shadow-stone-500">
-            {arr[count]}
+            <PDF />
           </div>
         </div>
         <Button> Next Invoice</Button>
