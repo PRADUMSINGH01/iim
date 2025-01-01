@@ -1,6 +1,18 @@
 "use client";
 
-const Invoice = () => {
+const Invoice = ({
+  BussiName,
+  Image,
+  BussiMail,
+  BussiAddOne,
+  BussiAddTwo,
+  CustoName,
+  CustoMail,
+  CustoAddOne,
+  CustoAddTwo,
+  Price,
+  items,
+}) => {
   return (
     <div className="w-full flex flex-col justify-around bg-white h-full ">
       <div className="w-full h-[2rem] bg-stone-200"> </div>

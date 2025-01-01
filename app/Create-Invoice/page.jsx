@@ -1,26 +1,14 @@
 "use client";
-//import argon2 from "argon2";
+import { useState, useRef } from "react";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useRef } from "react";
-import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
-import AddCookies from "@/lib/AddCookies";
-function page({ className, ...props }) {
-  const [success, setsuccess] = useState("");
-  const [items, setitems] = useState([]);
-  const inputRef = useRef(null);
-  const inputPrice = useRef(null);
-  const [price, setprice] = useState([]);
+
+function Page({ className, ...props }) {
   const [formData, setFormData] = useState({
     LogoUrl: "",
     Business_Name: "",
@@ -31,283 +19,187 @@ function page({ className, ...props }) {
     Customer_Mail: "",
     Customer_AddOne: "",
     Customer_AddTwo: "",
-
+    items: [],
+    price: [],
     Invoice_Id: "",
     Invoice_Date: "",
-    Invoice_Payment: ["Due", "Done"],
-    Invoice_Id: "",
+    Invoice_Payment: "Due",
+    invoice_Id: "",
+    Custo_Info: "",
   });
-  const HandleForm = (e) => {
+
+  const [successMessage, setSuccessMessage] = useState("");
+  const inputRef = useRef(null);
+  const priceRef = useRef(null);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((pre) => ({ ...pre, [name]: value }));
-  };
-  /**
- * 
- 
-
-  const Verification = async () => {
-    const usersRef = collection(db, "Users"); // Replace 'users' with your collection name
-    const q = query(usersRef, where("email", "==", formData.email));
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      console.log("User Not exists with this email.");
-      return "User Not exists";
-    } else {
-      const results = [];
-      querySnapshot.forEach((doc) => {
-        results.push({ id: doc.id, ...doc.data() });
-      });
-      const shouldPasswordVerify = await results[0].password;
-      const res = await fetch("/api/Login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          dbpassword: shouldPasswordVerify,
-          password: formData.password,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.token) {
-        setsuccess(data.msg);
-        console.log("data " + data.token);
-
-        AddCookies(data.token);
-      } else {
-        setsuccess(data.msg);
-      }
-    }
-  };
-
-   */
-  const deleteItem = (index) => {
-    setitems((prevItems) => prevItems.filter((_, i) => i !== index)); // Remove item by index
-  };
-
-  const deletePrice = (index) => {
-    setprice((deleteitems) =>
-      deleteitems.filter((_, i) => {
-        if (i !== index) {
-          return;
-        }
-      })
-    );
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const addItem = () => {
-    const value = inputRef.current.value.trim(); // Get the input value from the ref
+    const value = inputRef.current.value.trim();
     if (value) {
-      setitems((prevItems) => [...prevItems, value]); // Add to the state to trigger re-render for the list
-      inputRef.current.value = ""; // Clear the input field
+      setFormData((prev) => ({
+        ...prev,
+        items: [...prev.items, value],
+      }));
+      inputRef.current.value = ""; // Clear input field
     }
   };
 
-  const AddPrice = () => {
-    const value = inputPrice.current.value.trim();
+  const addPrice = () => {
+    const value = priceRef.current.value.trim();
     if (value) {
-      setprice((prevItems) => [...prevItems, value]);
+      setFormData((prev) => ({
+        ...prev,
+        price: [...prev.price, value],
+      }));
+      priceRef.current.value = ""; // Clear input field
     }
   };
+
+  const deleteItem = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index),
+    }));
+  };
+
+  const deletePrice = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      price: prev.price.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addDoc(collection(db, "Invoice"), formData);
+      setSuccessMessage("Invoice created successfully!");
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <div>
-        <hr />
-      </div>
-      {success ? (
-        <div className="bg-black text-white text-2xl absolute ">{success}</div>
-      ) : (
-        <></>
+      {successMessage && (
+        <div className="bg-black text-white text-2xl absolute">
+          {successMessage}
+        </div>
       )}
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-center font-[family-name:var(--font-geist-sans)]">
-            Add Your Invoice Details Once{" "}
+          <CardTitle className="text-2xl text-center">
+            Add Your Invoice Details
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form>
-            <div className="flex flex-col md:flex-row md:justify-between w-full gap-6">
-              <div className="flex flex-col h-full justify-around w-1/2">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">From----</Label>
-                  <Label htmlFor="email">Business Name </Label>
-                  <Input
-                    id="text"
-                    type="text"
-                    name="Business_Name"
-                    placeholder="Hello.pvt"
-                    required
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Business Email </Label>
-                  <Input
-                    id="mail"
-                    type="mail"
-                    name="Business_Mail"
-                    placeholder="Hello.pvt@gmail.com"
-                    required
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Address One</Label>
-                  </div>
-                  <Input
-                    id="text"
-                    type="text"
-                    name="Business_AddOne"
-                    placeholder="13/345"
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Address Two</Label>
-                  </div>
-                  <Input
-                    id="text"
-                    type="text"
-                    name="Business_AddTwo"
-                    placeholder="peter street 312 park"
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Business Section */}
+              <div className="flex flex-col gap-4 w-1/2">
+                <Label>Business Name</Label>
+                <Input
+                  type="text"
+                  name="Business_Name"
+                  placeholder="Business Name"
+                  value={formData.Business_Name}
+                  onChange={handleInputChange}
+                />
+                <Label>Business Email</Label>
+                <Input
+                  type="email"
+                  name="Business_Mail"
+                  placeholder="Business Email"
+                  value={formData.Business_Mail}
+                  onChange={handleInputChange}
+                />
+                <Label>Invoice Number</Label>
+                <Input
+                  type="text"
+                  name="invoice_Id"
+                  placeholder="Invoice Id"
+                  value={formData.invoice_Id}
+                  onChange={handleInputChange}
+                />
 
-                  <span className="mt-5 text-xl ">Add Items</span>
-
-                  <Input
-                    ref={inputRef} // Attach the ref to the input
-                    id="text"
-                    type="text"
-                    name="item"
-                    placeholder="CTR Graphic card"
-                    required
-                  />
-                  <Button onClick={addItem} className="w-20">
-                    Add Items{" "}
-                  </Button>
-                  {items
-                    ? items.map((item, index) => (
-                        <div className="flex flex-col p-1" key={index}>
-                          {item}
-                          <Button
-                            onClick={() => deleteItem(index)}
-                            className="bg-red-300 text-white  hover:bg-red-500"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      ))
-                    : "No Items"}
-                  <hr className="w-full h-1 bg-black mt-10" />
-                  <span className="mt-5 text-xl ">Add Price</span>
-
-                  <Input
-                    ref={inputPrice} // Attach the ref to the input
-                    id="text"
-                    type="number"
-                    name="item"
-                    placeholder=" Price "
-                    required
-                  />
-
-                  {price
-                    ? price.map((item, index) => (
-                        <div className="flex flex-col p-1" key={index}>
-                          {item}
-                          <Button
-                            onClick={() => deletePrice(index)}
-                            className="bg-red-300 text-white  hover:bg-red-500"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      ))
-                    : "No Items"}
-                  <Button onClick={AddPrice} className="w-20">
-                    Add Price{" "}
-                  </Button>
-                </div>
-
-                <hr className="w-full h-1 bg-black mt-10" />
-
-                <div className="grid gap-2 mt-2">
-                  <Label htmlFor="email" className="text-xl">
-                    {" "}
-                    Add Your Tex{" "}
-                  </Label>
-                  <Input
-                    id="tax"
-                    type="number"
-                    name="Business_Mail"
-                    placeholder="GST FAT ... "
-                    required
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col w-1/2">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">For----</Label>
-                  <Label htmlFor="email">Customer Name </Label>
-                  <Input
-                    id="text"
-                    type="text"
-                    name="Customer_Business_Name"
-                    placeholder="Hello.pvt"
-                    required
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Customer Email </Label>
-                  <Input
-                    id="mail"
-                    type="mail"
-                    name="Customer_Mail"
-                    placeholder="Hello@gmail.com"
-                    required
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Address One</Label>
-                  </div>
-                  <Input
-                    id="text"
-                    type="text"
-                    name="Customer_AddOne"
-                    placeholder="13/345"
-                    required
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Address Two</Label>
-                  </div>
-                  <Input
-                    id="text"
-                    type="text"
-                    name="Customer_AddTwo"
-                    placeholder="peter street 312 park"
-                    required
-                    value={formData.value}
-                    onChange={HandleForm}
-                  />
-                </div>
-                <Button type="submit" className="w-full mt-5">
-                  Create Invoice
+                {/* Items */}
+                <Label>Add Items</Label>
+                <Input ref={inputRef} type="text" placeholder="Add Item" />
+                <Button type="button" onClick={addItem}>
+                  Add Item
                 </Button>
+                <ul>
+                  {formData.items.map((item, index) => (
+                    <li key={index}>
+                      {item}{" "}
+                      <Button
+                        type="button"
+                        onClick={() => deleteItem(index)}
+                        className="text-red-500"
+                      >
+                        Delete
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Customer Section */}
+              <div className="flex flex-col gap-4 w-1/2">
+                <Label>Customer Name</Label>
+                <Input
+                  type="text"
+                  name="Customer_Business_Name"
+                  placeholder="Customer Name"
+                  value={formData.Customer_Business_Name}
+                  onChange={handleInputChange}
+                />
+
+                <Label>Customer Email</Label>
+                <Input
+                  type="email"
+                  name="Customer_Mail"
+                  placeholder="Customer Email"
+                  value={formData.Customer_Mail}
+                  onChange={handleInputChange}
+                />
+                <Label> Customer Info</Label>
+                <textarea
+                  type="textarea"
+                  name="Custo_Info"
+                  placeholder="Invoice Id"
+                  value={formData.Custo_Info}
+                  onChange={handleInputChange}
+                ></textarea>
+
+                {/* Price */}
+                <Label>Add Price</Label>
+                <Input ref={priceRef} type="number" placeholder="Add Price" />
+                <Button type="button" onClick={addPrice}>
+                  Add Price
+                </Button>
+                <ul>
+                  {formData.price.map((price, index) => (
+                    <li key={index}>
+                      {price}{" "}
+                      <Button
+                        type="button"
+                        onClick={() => deletePrice(index)}
+                        className="text-red-500"
+                      >
+                        Delete
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
+            <Button type="submit" className="mt-6">
+              Create Invoice
+            </Button>
           </form>
         </CardContent>
       </Card>
@@ -315,4 +207,4 @@ function page({ className, ...props }) {
   );
 }
 
-export default page;
+export default Page;
