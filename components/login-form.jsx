@@ -9,13 +9,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { signIn, signOut, useSession } from 'next-auth/react'
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import AddCookies from "@/lib/AddCookies";
 export function LoginForm({ className, ...props }) {
+  const { data: session } = useSession();
+
+
+
+
+useEffect(()=>{
+
+function sessiondata(){
+  if(!session){
+    return window.location.href = '/'
+  }
+}
+sessiondata()
+
+
+},[])
+
+
   const [success, setsuccess] = useState("");
   const [formData, setFormData] = useState({
     email: "",
@@ -25,6 +45,9 @@ export function LoginForm({ className, ...props }) {
     const { name, value } = e.target;
     setFormData((pre) => ({ ...pre, [name]: value }));
   };
+
+
+
 
   const Verification = async () => {
     const usersRef = collection(db, "Users"); // Replace 'users' with your collection name
@@ -113,8 +136,9 @@ export function LoginForm({ className, ...props }) {
               <Button
                 variant="outline"
                 className="w-full text-white bg-pink-500"
+                onClick={() => signIn('github')}
               >
-                Login with Google
+                Login with Github
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

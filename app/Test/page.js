@@ -1,22 +1,24 @@
-import { MongoClient } from "mongodb";
-const uri =
-  "mongodb+srv://hs9040301:yourPassword@users.rhh1o.mongodb.net/Users?retryWrites=true&w=majority=false";
+"use client";
 
-async function testConnection() {
-  try {
-    const client = new MongoClient(uri);
-    await client.connect();
-    console.log("Connected successfully to MongoDB!");
-    await client.close();
-  } catch (error) {
-    console.error("Connection failed:", error.message);
-  }
+import { signIn, signOut, useSession } from 'next-auth/react'
+
+export default function HomePage() {
+  const { data: session } = useSession();
+
+  return (
+    <div>
+      {!session ? (
+        <button onClick={() => signIn('github')} className="btn btn-primary">
+          Sign in with GitHub
+        </button>
+      ) : (
+        <div>
+          <h1>Welcome, {session.user.name}</h1>
+          <button onClick={() => signOut()} className="btn btn-secondary">
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
-
-testConnection();
-
-const Test = () => {
-  return <>test</>;
-};
-
-export default Test;
